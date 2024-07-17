@@ -1,14 +1,14 @@
 #!/bin/bash
 
+# Creates new or attaches to existing tmux session with specific name (and location)
+# Takes a path (starting from home) to directory or current directory ("ts .") which becomes starting directory of tmux session.
+# Last element of the path becomes session name.
+# The directory may not exist - in this case it will be created. But parent directories must exist.
+# Session are distinguished only by session name - two sessions with the same name cannot exist even if they have different location.
 ts() {
-    # Extract directory path and session_name name from the input
-#    session_name=1
-    #dir="${1%/*}"
-    #name="${1##*/}"
-
+    # Extract directory and session name name from the input
     if [ "$1" = "." ]; then
         dir=$(pwd)
-        #name=$(basename "$(dirname "$dir")")
     else
         dir=$1
     fi
@@ -16,9 +16,9 @@ ts() {
     session_name="${dir##*/}"
     parent_dir="${dir%/*}"
 
-    echo $dir
-    echo $parent_dir
-    echo $session_name
+    echo Directory: $dir
+    echo Parent directory: $parent_dir
+    echo Session name: $session_name
 
     # If parent directory doesn't exist, exit with error
     if [ ! -d "$parent_dir" ]; then
@@ -32,19 +32,9 @@ ts() {
         mkdir -p $dir
     fi
 
-    # Start tmux session_name with given name, if it doesn't exist
+    # Start tmux session with given name, if it doesn't exist
     tmux has-session_name -t "$session_name" 2>/dev/null || tmux new-session -d -s "$session_name" -c "$dir"
 
-    # Create a new window in the tmux session_name with a nvim
-    #tmux new-window -t "$session_name" -c "$dir" \; send-keys -t "$session_name:1" "nvim $dir" Enter
-
-    # Create a new window in the tmux session_name with a terminal
-    #tmux new-window -t "$session_name" -c "$dir"
-
-    #tmux -t "$session_name" select-window -t 1
-    
-    # Attach to tmux session_name and open nvim in the specified directory
+    # Attach to tmux session
     tmux attach-session -t "$session_name:1"
-
-    #tmux attach-session -t "$session_name" \; send-keys "nvim $dir" Enter
 }
