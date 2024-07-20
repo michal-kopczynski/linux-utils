@@ -14,6 +14,7 @@ ts() {
     fi
 
     session_name="${dir##*/}"
+    session_name="${session_name//./_}"
     parent_dir="${dir%/*}"
 
     echo Directory: $dir
